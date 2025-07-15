@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Docente</title>
+  <link rel="stylesheet" href="style/index.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Panel de Estudiantes</h2>
+    <div id="studentsList" class="cards-container">
+      Cargando estudiantes...
+    </div>
+    <div class="acciones">
+      <button class="btn btn-secondary" onclick="exportarResultados()">📄 Exportar Resultados</button>
+      <button class="btn btn-danger" onclick="cerrarSesion()">🔒 Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('controlador.php?accion=estudiantes')
+        .then(res => res.json())
+        .then(estudiantes => {
+          const contenedor = document.getElementById('studentsList');
+          contenedor.innerHTML = '';
+
+          if (estudiantes.length === 0) {
+            contenedor.innerHTML = '<p>No hay estudiantes registrados.</p>';
+            return;
+          }
+
+          estudiantes.forEach(est => {
+            const registros = (JSON.parse(localStorage.getItem('results') || '[]')).filter(r => r.user === est.username);
+            const total = registros.length;
+            const correctos = registros.filter(r => r.correct).length;
+            const porcentaje = total ? Math.round((correctos / total) * 100) : 0;
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <h3>${est.username}</h3>
+              <p><strong>Progreso:</strong> ${porcentaje}% (${correctos}/${total})</p>
+              <div class="progress-bar"><div class="progress-fill" style="width:${porcentaje}%"></div></div>
+              <button class="btn btn-secondary" onclick="enviarRecomendacion('${est.username}')">📤 Enviar Recomendación</button>
+            `;
+            contenedor.appendChild(card);
+          });
+        });
+    });
+
+    function exportarResultados() {
+      const resultados = JSON.parse(localStorage.getItem('results') || '[]');
+      let csv = "Estudiante,Correctas,Totales,Porcentaje\n";
+
+      const resumen = {};
+
+      resultados.forEach(r => {
+        if (!resumen[r.user]) resumen[r.user] = { correctas: 0, total: 0 };
+        resumen[r.user].total += 1;
+        if (r.correct) resumen[r.user].correctas += 1;
+      });
+
+      for (const estudiante in resumen) {
+        const { correctas, total } = resumen[estudiante];
+        const porcentaje = total ? Math.round((correctas / total) * 100) : 0;
+        csv += `${estudiante},${correctas},${total},${porcentaje}%\n`;
+      }
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resultados.csv";
+      a.click();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    }
+
+    function enviarRecomendacion(usuario) {
+      alert(`📤 Recomendación enviada a ${usuario}`);
+    }
+  </script>
+</body>
+</html>

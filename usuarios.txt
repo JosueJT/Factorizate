@@ -1,0 +1,12 @@
+Josue|Josue2024|student
+Valeria|Valeria123|student
+Mateo|Mateo456|student
+Lucia|Lucia789|student
+Carlos|Carlos321|student
+Daniela|Daniela2024|teacher
+Mauricio|Mauricio123|teacher
+Esteban|Esteban456|teacher
+Camila|Camila789|teacher
+Andres|Andres321|teacher
+Miguel|200406|student
+Dario|123456|student

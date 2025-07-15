@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recuperar Contraseña - Factorízate</title>
+    <link rel="stylesheet" href="style/index.css">
+</head>
+<body>
+    <header class="hero">
+        <img src="img/logo.png" alt="Logo Factorízate">
+        <h1>Recuperar Contraseña</h1>
+        <p>Ingresa tus datos para restablecer tu contraseña</p>
+    </header>
+
+    <div class="recovery-container">
+        <div class="recovery-box">
+            <button class="btn-exit" onclick="window.location.href='index.html'">✕</button>
+            
+            <form id="formRecover">
+                <div id="step1">
+                    <div class="form-group">
+                        <label for="username">Nombre de usuario:</label>
+                        <input type="text" id="username" placeholder="Ingresa tu nombre de usuario" required>
+                    </div>
+                    <button type="button" id="btnRecover">
+                        <span id="btnText">Verificar Usuario</span>
+                    </button>
+                    <!--boton para slair al indes-->
+                    <button type="button" class="btn-exit" onclick="window.location.href='index.html'">Volver al Inicio</button>
+                    <div id="feedbackRecover"></div>
+                </div>
+                
+                <div id="step2" class="hidden">
+                    <div class="form-group">
+                        <label for="newPassword">Nueva contraseña:</label>
+                        <input type="password" id="newPassword" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmar contraseña:</label>
+                        <input type="password" id="confirmPassword" placeholder="Repite la contraseña" required>
+                    </div>
+                    <button type="button" id="btnUpdatePass">
+                        <span id="btnUpdateText">Actualizar Contraseña</span>
+                    </button>
+                    <div id="feedbackUpdate"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2025 Factorízate — Plataforma educativa para dominar la factorización algebraica
+        <span>Desarrollado por 💡 Trimedia</span>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const btnRecover = document.getElementById('btnRecover');
+            const btnUpdatePass = document.getElementById('btnUpdatePass');
+            const btnText = document.getElementById('btnText');
+            const btnUpdateText = document.getElementById('btnUpdateText');
+            const feedbackRecover = document.getElementById('feedbackRecover');
+            const feedbackUpdate = document.getElementById('feedbackUpdate');
+            const usernameInput = document.getElementById('username');
+            const newPasswordInput = document.getElementById('newPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            
+            let currentUsername = '';
+            
+            // Verificar usuario
+            btnRecover.addEventListener('click', async function() {
+                const username = usernameInput.value.trim();
+                
+                if (!username) {
+                    showFeedback(feedbackRecover, 'Por favor ingresa tu nombre de usuario', 'error');
+                    return;
+                }
+                
+                btnRecover.disabled = true;
+                btnText.innerHTML = '<span class="loading"></span> Verificando...';
+                
+                try {
+                    const response = await fetch('recuperarContraseña.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `username=${encodeURIComponent(username)}`
+                    });
+                    
+                    const data = await response.text();
+                    
+                    if (data.includes("Usuario encontrado")) {
+                        currentUsername = username;
+                        step1.classList.add('hidden');
+                        step2.classList.remove('hidden');
+                        newPasswordInput.focus();
+                        showFeedback(feedbackRecover, '', '');
+                    } else {
+                        showFeedback(feedbackRecover, data.includes("Usuario no encontrado") ? data : 'Error en la verificación', 'error');
+                    }
+                } catch (error) {
+                    showFeedback(feedbackRecover, 'Error de conexión', 'error');
+                    console.error('Error:', error);
+                } finally {
+                    btnRecover.disabled = false;
+                    btnText.textContent = 'Verificar Usuario';
+                }
+            });
+            
+            // Actualizar contraseña
+            btnUpdatePass.addEventListener('click', async function() {
+                const newPassword = newPasswordInput.value.trim();
+                const confirmPassword = confirmPasswordInput.value.trim();
+                
+                if (newPassword.length < 6) {
+                    showFeedback(feedbackUpdate, 'La contraseña debe tener al menos 6 caracteres', 'error');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    showFeedback(feedbackUpdate, 'Las contraseñas no coinciden', 'error');
+                    return;
+                }
+                
+                btnUpdatePass.disabled = true;
+                btnUpdateText.innerHTML = '<span class="loading"></span> Actualizando...';
+                
+                try {
+                    const response = await fetch('recuperarContraseña.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `username=${encodeURIComponent(currentUsername)}&newPassword=${encodeURIComponent(newPassword)}`
+                    });
+                    
+                    const data = await response.text();
+                    
+                    if (data.includes("Contraseña actualizada")) {
+                        showFeedback(feedbackUpdate, data, 'success');
+                        
+                        setTimeout(() => {
+                            // Resetear el formulario
+                            usernameInput.value = '';
+                            newPasswordInput.value = '';
+                            confirmPasswordInput.value = '';
+                            step2.classList.add('hidden');
+                            step1.classList.remove('hidden');
+                            feedbackUpdate.textContent = '';
+                            currentUsername = '';
+                        }, 2000);
+                    } else {
+                        showFeedback(feedbackUpdate, data.includes("Error") ? data : 'Error al actualizar la contraseña', 'error');
+                    }
+                } catch (error) {
+                    showFeedback(feedbackUpdate, 'Error de conexión', 'error');
+                    console.error('Error:', error);
+                } finally {
+                    btnUpdatePass.disabled = false;
+                    btnUpdateText.textContent = 'Actualizar Contraseña';
+                }
+            });
+            
+            // Función para mostrar mensajes de feedback
+            function showFeedback(element, text, type) {
+                element.textContent = text;
+                element.className = type ? type : '';
+            }
+            
+            // Permitir enviar con Enter
+            usernameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') btnRecover.click();
+            });
+            
+            newPasswordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') btnUpdatePass.click();
+            });
+            
+            confirmPasswordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') btnUpdatePass.click();
+            });
+        });
+    </script>
+</body>
+</html>

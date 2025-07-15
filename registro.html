@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Factorízate - Registro</title>
+  <link rel="stylesheet" href="style/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="hero">
+    <img src="img/logo.png" alt="Logo Factorízate">
+    <h1>Registro de Usuario</h1>
+    <p>Crea tu cuenta para comenzar a aprender o enseñar factorización.</p>
+  </header>
+
+  <main class="login-container">
+    <section class="login-box">
+      <h2>Crear Cuenta</h2>
+      <form id="formularioRegistro">
+        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
+        <select name="userType" required>
+          <option value="">Selecciona tipo de usuario</option>
+          <option value="student">Estudiante</option>
+          <option value="teacher">Docente</option>
+        </select>
+        <button type="submit">Registrarse</button>
+      </form>
+
+      <a href="index.html" class="forgot-password">← Volver al inicio</a>
+
+      <div id="feedbackArea"></div>
+    </section>
+
+    <div class="illustration">
+      <img src="https://cdn-icons-png.flaticon.com/512/4761/4761481.png" alt="Registro Ilustración">
+    </div>
+  </main>
+
+  <footer class="footer">
+    © 2025 Factorízate — Plataforma educativa para dominar la factorización algebraica
+    <span>Desarrollado 💡 por Trimedia</span>
+  </footer>
+
+  <script>
+    document.getElementById('formularioRegistro').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const feedback = document.getElementById('feedbackArea');
+      feedback.innerHTML = '';
+
+      fetch('controlador.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.text())
+      .then(data => {
+        if (data.trim() === 'OK') {
+          feedback.innerHTML = '<div class="feedback success"><span class="feedback-icon">✅</span> Usuario registrado correctamente. Redirigiendo...</div>';
+          setTimeout(() => {
+            const tipo = formData.get('userType');
+            if (tipo === 'student') {
+              window.location.href = 'loginEstudiante.html';
+            } else {
+              window.location.href = 'loginDocente.html';
+            }
+          }, 2000);
+        } else {
+          feedback.innerHTML = '<div class="feedback error"><span class="feedback-icon">❌</span> ' + data + '</div>';
+        }
+      })
+      .catch(error => {
+        feedback.innerHTML = '<div class="feedback error"><span class="feedback-icon">⚠️</span> Error de conexión con el servidor.</div>';
+        console.error(error);
+      });
+    });
+  </script>
+</body>
+</html>

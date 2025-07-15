@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Factorízate - Estudiante</title>
+  <link rel="stylesheet" href="style/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .math-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0 20px;
+      justify-content: center;
+    }
+
+    .math-toolbar button {
+      padding: 10px 14px;
+      font-size: 1.1rem;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .math-toolbar button:hover {
+      background-color: #ddd;
+    }
+
+    #studentAnswer {
+      width: 100%;
+      font-size: 1.2rem;
+      padding: 12px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      margin: 10px 0 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="hero">
+    <h1 id="studentName">¡Bienvenido, estudiante!</h1>
+    <p>Selecciona un nivel para comenzar a practicar.</p>
+    <button class="btn btn-secondary" onclick="cerrarSesion()" style="margin-top: 10px;">🚪 Salir</button>
+  </header>
+
+  <main class="cards" id="niveles">
+    <div class="card" onclick="startLevel(1)">
+      <img src="https://cdn-icons-png.flaticon.com/512/2203/2203187.png" alt="Nivel 1">
+      <h3>Nivel 1: Factor Común</h3>
+      <p>Identifica y extrae factores comunes en expresiones algebraicas.</p>
+    </div>
+
+    <div class="card" onclick="startLevel(2)">
+      <img src="https://cdn-icons-png.flaticon.com/512/167/167707.png" alt="Nivel 2">
+      <h3>Nivel 2: Diferencia de Cuadrados</h3>
+      <p>Aplica la fórmula a² - b² = (a + b)(a - b).</p>
+    </div>
+  </main>
+
+  <section id="exerciseSection" class="login-container" style="display: none;">
+    <div class="login-box" style="width: 100%; max-width: 800px;">
+      <h2 id="exerciseTitle">Ejercicio Actual</h2>
+
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+      </div>
+      <div class="step-indicator">
+        <div class="step active">1</div>
+        <div class="step">2</div>
+        <div class="step">3</div>
+        <div class="step">4</div>
+      </div>
+
+      <div id="exerciseProblem" class="exercise-problem">...</div>
+      <div class="visual-blocks" id="visualBlocks"></div>
+
+      <label for="studentAnswer" style="font-weight: bold;">Tu respuesta:</label>
+      <input type="text" id="studentAnswer" placeholder="Escribe aquí la factorización...">
+
+      <div id="mathKeyboard">
+        <div class="math-key" onclick="insertSymbol('²')">x²</div>
+        <div class="math-key" onclick="insertSymbol('³')">x³</div>
+        <div class="math-key" onclick="insertSymbol('√')">√</div>
+        <div class="math-key" onclick="insertSymbol('(')">(</div>
+        <div class="math-key" onclick="insertSymbol(')')">)</div>
+        <div class="math-key" onclick="insertSymbol('+')">+</div>
+        <div class="math-key" onclick="insertSymbol('-')">−</div>
+        <div class="math-key" onclick="insertSymbol('=')">=</div>
+        <div class="math-key" onclick="insertSymbol('^')">^</div>
+        <div class="math-key" onclick="insertSymbol('x')">x</div>
+        <div class="math-key" onclick="insertSymbol('a')">a</div>
+        <div class="math-key" onclick="insertSymbol('b')">b</div>
+      </div>
+
+
+      <div class="button-grid">
+        <button class="btn" onclick="checkAnswer()">✅ Verificar</button>
+        <button class="btn btn-secondary" onclick="getHint()">💡 Pista</button>
+        <button class="btn btn-secondary" onclick="previousStep()">⬅ Anterior</button>
+        <button class="btn" onclick="nextStep()">Siguiente ➡</button>
+      </div>
+
+      <div id="feedbackArea"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    © 2025 Factorízate — Plataforma educativa para dominar la factorización algebraica
+    <span>Desarrollado 💡 por Trimedia</span>
+  </footer>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user || user.userType !== 'student') {
+      window.location.href = 'loginEstudiante.html';
+    } else {
+      document.getElementById('studentName').textContent = `¡Bienvenido, ${user.username}! 🎓`;
+    }
+
+    const exercises = {
+      1: [
+        {
+          problem: "6x²+12x",
+          answer: "6x(x+2)",
+          patterns: [
+            "6x(x+2)",
+            "6x*(x+2)",
+            "6x.(x+2)",
+            "6.x.(x+2)",
+            "6*x*(x+2)",
+            "(x+2)6x",
+          ],
+          hint: [
+            "Mira los números 6 y 12. ¿Qué número grande divide a ambos?",
+            "Fíjate en las letras. Ambas tienen x, ¿cuál es la x con el exponente más pequeño?",
+            "Saca el número que divide a ambos y la letra común",
+            "Pista final: La respuesta es 6x(...) ¿qué va dentro del paréntesis?"
+          ]
+        },
+        {
+          problem: "8a³+12a²",
+          answer: "4a²(2a+3)",
+          patterns: [
+            "4a²(2a+3)",
+            "4a^2(2a+3)",
+            "4a^2*(2a+3)",
+            "4*a^2*(2*a+3)",
+            "4.a^2.(2a+3)",
+            "4a^2.(2a+3)",
+            "4*a*a*(2*a+3)",
+            "4.a.a.(2.a+3)",
+            "4a²*(2a+3)",
+            "4*a²*(2*a+3)",
+            "(2a+3)4a²",
+            "4(a³+3a²)"
+          ],
+          hint: [
+            "Busca un número que divida a 8 y 12",
+            "Ambos términos tienen a² o más",
+            "El número más grande que divide es 4",
+            "Pista final: 4a²(...) - completa el paréntesis"
+          ]
+        }
+      ],
+      2: [
+        {
+          problem: "x²-9",
+          answer: "(x+3)(x-3)",
+          patterns: [
+            "(x+3)(x-3)",
+            "(x+3).(x-3)",
+            "(x-3)(x+3)",
+            "(x-3)*(x+3)",
+            "(x-3).(x+3)",
+            "(x + 3)(x - 3)",
+            "(x+3)*(x-3)",
+            "x²-3²"
+          ],
+          hint: [
+            "Esto es una resta de dos cuadrados: x² y 3²",
+            "La fórmula es (a+b)(a-b) donde a²=x² y b²=9",
+            "¿Qué número al cuadrado da 9?",
+            "Pista final: (x+...)(x-...)"
+          ]
+        },
+        {
+          problem: "4x²-25",
+          answer: "(2x+5)(2x-5)",
+          patterns: [
+            "(2x+5)(2x-5)",
+            "(2x+5)*(2x-5)",
+            "(2x+5).(2x-5)",
+            "(2*x+5)*(2*x-5)",
+            "(2.x+5).(2.x-5)",
+            "(2x-5)(2x+5)",
+            "(2*x-5)*(2*x+5)",
+            "(2.x-5).(2.x+5)",
+            "(2x + 5)(2x - 5)",
+            "4(x²-(5/2)²)",
+            "(2x)^2-5^2"
+          ],
+          hint: [
+            "4x² es (2x)² y 25 es 5²",
+            "Usa la fórmula de diferencia de cuadrados",
+            "Primero es la raíz del primer término",
+            "Pista final: (2x+5)(2x-5)"
+          ]
+        }
+      ]
+    };
+
+    let currentLevel = 1;
+    let currentExerciseIndex = 0;
+    let currentStep = 1;
+    let currentProgress = 0;
+
+    function startLevel(level) {
+      currentLevel = level;
+      currentExerciseIndex = 0;
+      currentStep = 1;
+      currentProgress = 0;
+
+      document.getElementById('niveles').style.display = 'none';
+      document.getElementById('exerciseSection').style.display = 'flex';
+      loadExercise();
+      updateProgress();
+    }
+
+    function loadExercise() {
+      const ex = exercises[currentLevel][currentExerciseIndex];
+      document.getElementById('exerciseProblem').textContent = `Factoriza: ${ex.problem}`;
+      document.getElementById('studentAnswer').value = '';
+      updateVisualBlocks(ex.problem);
+      document.getElementById('feedbackArea').innerHTML = '';
+    }
+
+    function updateVisualBlocks(problem) {
+      const container = document.getElementById('visualBlocks');
+      container.innerHTML = '';
+      problem.split(/([+-])/).filter(Boolean).forEach(token => {
+        const block = document.createElement('div');
+        block.className = 'block';
+        block.textContent = token;
+        container.appendChild(block);
+      });
+      const eq = document.createElement('div');
+      eq.className = 'block';
+      eq.textContent = '=';
+      container.appendChild(eq);
+      const qm = document.createElement('div');
+      qm.className = 'block';
+      qm.textContent = '?';
+      container.appendChild(qm);
+    }
+
+    function updateProgress() {
+      document.getElementById('progressFill').style.width = currentProgress + '%';
+      document.querySelectorAll('.step').forEach((el, i) => {
+        el.classList.toggle('completed', i < currentStep - 1);
+        el.classList.toggle('active', i === currentStep - 1);
+      });
+    }
+
+    function normalizarExpresion(expr) {
+      return expr
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .replace(/²/g, '^2')
+        .replace(/³/g, '^3')
+        .replace(/–/g, '-')
+        .replace(/\*\*/g, '^');
+    }
+    function checkAnswer() {
+      const answer = document.getElementById('studentAnswer').value.trim();
+      const exercise = exercises[currentLevel][currentExerciseIndex];
+      const feedback = document.getElementById('feedbackArea');
+
+      // Normalizar la respuesta del usuario
+      const normalizedAnswer = normalizarExpresion(answer);
+
+      // Verificar contra todas las posibles respuestas válidas
+      const isCorrect = exercise.patterns.some(pattern =>
+        normalizedAnswer === normalizarExpresion(pattern)
+      );
+
+      if (isCorrect) {
+        feedback.innerHTML = '<div class="feedback success"><span class="feedback-icon">✅</span> ¡Correcto!</div>';
+        recordResult({ type: 'exercise', correct: true });
+        currentProgress += 25;
+        updateProgress();
+        setTimeout(nextStep, 1000);
+      } else {
+        feedback.innerHTML = `<div class="feedback error"><span class="feedback-icon">❌</span> Incorrecto. Respuesta correcta: ${exercise.answer}</div>`;
+        recordResult({ type: 'exercise', correct: false });
+      }
+    }
+
+    let currentHintIndex = 0;
+
+    function getHint() {
+      const hints = exercises[currentLevel][currentExerciseIndex].hint;
+
+      // Mostrar la pista actual y avanzar al siguiente índice
+      document.getElementById('feedbackArea').innerHTML =
+        `<div class="feedback info"><span class="feedback-icon">💡</span> Pista: ${hints[currentHintIndex]}</div>`;
+
+      // Avanzar al siguiente índice de pista, circularmente
+      currentHintIndex = (currentHintIndex + 1) % hints.length;
+    }
+
+    // Resetear el índice de pistas cuando cambia de ejercicio
+    function loadExercise() {
+      const ex = exercises[currentLevel][currentExerciseIndex];
+      document.getElementById('exerciseProblem').textContent = `Factoriza: ${ex.problem}`;
+      document.getElementById('studentAnswer').value = '';
+      updateVisualBlocks(ex.problem);
+      document.getElementById('feedbackArea').innerHTML = '';
+      currentHintIndex = 0; // Reiniciar el contador de pistas
+    }
+
+    function nextStep() {
+      if (currentStep < 4) {
+        currentStep++;
+        if (currentStep === 2 && currentExerciseIndex < exercises[currentLevel].length - 1) {
+          currentExerciseIndex++;
+          loadExercise();
+        }
+        updateProgress();
+      }
+    }
+
+    function previousStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateProgress();
+      }
+    }
+
+    function recordResult(entry) {
+      const results = JSON.parse(localStorage.getItem('results') || '[]');
+      results.push({
+        ...entry,
+        user: user.username,
+        date: new Date().toISOString()
+      });
+      localStorage.setItem('results', JSON.stringify(results));
+    }
+
+    function insertSymbol(symbol) {
+      const input = document.getElementById('studentAnswer');
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      input.setRangeText(symbol, start, end, 'end');
+      input.focus();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+
+  </script>
+
+</body>
+
+</html>
