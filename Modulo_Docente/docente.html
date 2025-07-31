@@ -29,7 +29,10 @@
       contenedor.innerHTML = "Cargando estudiantes...";
 
       try {
-        const snapshot = await db.collection("usuarios").where("tipo", "==", "student").get();
+        // 🔹 Traer estudiantes desde Firestore
+        const snapshot = await db.collection("usuarios")
+                                .where("tipo", "==", "student")
+                                .get();
 
         contenedor.innerHTML = "";
 
@@ -40,17 +43,22 @@
 
         snapshot.forEach(doc => {
           const est = doc.data();
-          const registros = (JSON.parse(localStorage.getItem('results') || '[]')).filter(r => r.user === est.email);
-          const total = registros.length;
-          const correctos = registros.filter(r => r.correct).length;
-          const porcentaje = total ? Math.round((correctos / total) * 100) : 0;
+          
+          // 🔹 Si en Firestore tienes un campo "progreso", úsalo
+          const progreso = est.progreso || { correctas: 0, total: 0 };
+          const porcentaje = progreso.total > 0 
+                             ? Math.round((progreso.correctas / progreso.total) * 100) 
+                             : 0;
 
+          // 🔹 Crear tarjeta de estudiante
           const card = document.createElement("div");
           card.className = "card student-card";
           card.innerHTML = `
-            <h3>${est.email}</h3>
-            <p><strong>Progreso:</strong> ${porcentaje}% (${correctos}/${total})</p>
-            <div class="progress-bar"><div class="progress-fill" style="width:${porcentaje}%"></div></div>
+            <h4>${est.email}</h4>
+            <p><strong>Progreso:</strong> ${porcentaje}% (${progreso.correctas}/${progreso.total})</p>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${porcentaje}%"></div>
+            </div>
             <button class="btn btn-secondary" onclick="enviarRecomendacion('${est.email}')">📤 Enviar Recomendación</button>
           `;
           contenedor.appendChild(card);
@@ -60,23 +68,19 @@
       }
     });
 
-    function exportarResultados() {
-      const resultados = JSON.parse(localStorage.getItem("results") || "[]");
+    // 🔹 Exportar resultados a CSV (desde Firestore)
+    async function exportarResultados() {
+      const snapshot = await db.collection("usuarios").where("tipo", "==", "student").get();
       let csv = "Estudiante,Correctas,Totales,Porcentaje\n";
 
-      const resumen = {};
-
-      resultados.forEach(r => {
-        if (!resumen[r.user]) resumen[r.user] = { correctas: 0, total: 0 };
-        resumen[r.user].total += 1;
-        if (r.correct) resumen[r.user].correctas += 1;
+      snapshot.forEach(doc => {
+        const est = doc.data();
+        const progreso = est.progreso || { correctas: 0, total: 0 };
+        const porcentaje = progreso.total > 0 
+                           ? Math.round((progreso.correctas / progreso.total) * 100) 
+                           : 0;
+        csv += `${est.email},${progreso.correctas},${progreso.total},${porcentaje}%\n`;
       });
-
-      for (const estudiante in resumen) {
-        const { correctas, total } = resumen[estudiante];
-        const porcentaje = total ? Math.round((correctas / total) * 100) : 0;
-        csv += `${estudiante},${correctas},${total},${porcentaje}%\n`;
-      }
 
       const blob = new Blob([csv], { type: "text/csv" });
       const url = URL.createObjectURL(blob);
@@ -86,6 +90,7 @@
       a.click();
     }
 
+    // 🔹 Cerrar sesión
     function cerrarSesion() {
       localStorage.removeItem("currentUser");
       auth.signOut().then(() => {
@@ -93,6 +98,7 @@
       });
     }
 
+    // 🔹 Enviar recomendación (placeholder)
     function enviarRecomendacion(usuario) {
       alert(`📤 Recomendación enviada a ${usuario}`);
     }
