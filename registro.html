@@ -2,14 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Factorízate - Registro</title>
-  <link rel="stylesheet" href="style/index.css">
+  <title>Registro de Usuario</title>
+  <link rel="stylesheet" href="./style/index.css"> <!-- Ajusta la ruta según tu carpeta -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-  <header class="hero">
-    <img src="img/logo.png" alt="Logo Factorízate">
+  <header class="hero" style="position: relative;">
+    <button onclick="window.location.href='index.html'" class="btn btn-secondary" style="position: absolute; top: 20px; left: 20px;">
+      ← Volver
+    </button>
+    <img src="./img/logo.png" alt="Logo Factorízate">
     <h1>Registro de Usuario</h1>
     <p>Crea tu cuenta para comenzar a aprender o enseñar factorización.</p>
   </header>
@@ -17,67 +20,58 @@
   <main class="login-container">
     <section class="login-box">
       <h2>Crear Cuenta</h2>
-      <!-- Eliminamos el submit para evitar error 405 -->
-      <form id="formularioRegistro">
-        <input type="email" name="email" placeholder="Correo electrónico" required>
-        <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
-        <select name="userType" required>
-          <option value="">Selecciona tipo de usuario</option>
+      <form id="formRegistro">
+        <input type="email" id="regEmail" placeholder="Correo electrónico" required>
+        <input type="password" id="regPassword" placeholder="Contraseña" required>
+        <select id="regTipo" required>
           <option value="student">Estudiante</option>
           <option value="teacher">Docente</option>
         </select>
-        <!-- Botón cambiado a type="button" -->
-        <button type="button" id="btnRegister">Registrarse</button>
+        <button type="button" id="btnRegistro">Registrarse</button>
       </form>
-
       <a href="index.html" class="forgot-password">← Volver al inicio</a>
-
       <div id="feedbackArea"></div>
     </section>
   </main>
 
   <footer class="footer">
-    © 2025 Factorízate — Plataforma educativa
+    © 2025 Factorízate — Plataforma educativa para dominar la factorización algebraica
+    <span>Desarrollado 💡 por Trimedia</span>
   </footer>
 
-  <!-- Firebase SDK (compat) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="./js/firebaseConfig.js"></script>
 
-  <!-- Configuración central -->
-  <script src="js/firebaseConfig.js"></script>
-
-  <!-- Script de registro -->
   <script>
-    document.getElementById('btnRegister').addEventListener('click', function() {
-      const email = document.querySelector('[name="email"]').value;
-      const password = document.querySelector('[name="password"]').value;
-      const userType = document.querySelector('[name="userType"]').value;
-      const feedback = document.getElementById('feedbackArea');
+    const btnRegistro = document.getElementById("btnRegistro");
+    const feedback = document.getElementById("feedbackArea");
+
+    btnRegistro.addEventListener("click", () => {
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      const tipo = document.getElementById("regTipo").value;
 
       auth.createUserWithEmailAndPassword(email, password)
         .then(userCredential => {
-          // Guardamos datos extra en Firestore
-          return db.collection("usuarios").doc(userCredential.user.uid).set({
+          const uid = userCredential.user.uid;
+
+          // Guardar en Firestore
+          return db.collection("usuarios").doc(uid).set({
             email: email,
-            tipo: userType
+            tipo: tipo
           });
         })
         .then(() => {
-          feedback.innerHTML = '<div class="feedback success">✅ Usuario registrado correctamente.</div>';
-          setTimeout(() => {
-            if (userType === 'student') {
-              window.location.href = 'Modulo_Estudiante/loginEstudiante.html';
-            } else {
-              window.location.href = 'Modulo_Docente/loginDocente.html';
-            }
-          }, 1500);
+          feedback.innerHTML = `<div class="feedback success">✅ Registro exitoso, ahora puedes iniciar sesión.</div>`;
         })
         .catch(err => {
           feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
         });
     });
   </script>
+
 </body>
 </html>

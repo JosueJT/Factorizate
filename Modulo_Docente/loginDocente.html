@@ -23,7 +23,7 @@
       <form id="formLoginDocente">
         <input type="email" name="username" placeholder="Correo electrónico" required>
         <input type="password" name="password" placeholder="Contraseña" required>
-        <!-- Cambiamos a type="button" -->
+        <!-- Botón corregido -->
         <button type="button" id="btnLoginDoc">Ingresar</button>
       </form>
 
@@ -43,47 +43,39 @@
     <span>Desarrollado 💡 por Trimedia</span>
   </footer>
 
-<form id="formLoginDocente">
-  <input type="email" name="username" placeholder="Correo electrónico" required>
-  <input type="password" name="password" placeholder="Contraseña" required>
-  <button type="button" id="btnLoginDoc">Ingresar</button>
-</form>
+  <!-- Firebase SDK + config -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebaseConfig.js"></script>
 
-<div id="feedbackArea"></div>
+  <!-- Script de login -->
+  <script>
+    document.getElementById('btnLoginDoc').addEventListener('click', function() {
+      const email = document.querySelector('[name="username"]').value;
+      const password = document.querySelector('[name="password"]').value;
+      const feedback = document.getElementById('feedbackArea');
 
-<!-- Firebase SDK + config -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="../js/firebaseConfig.js"></script>
-
-<!-- Script de login -->
-<script>
-  document.getElementById('btnLoginDoc').addEventListener('click', function() {
-    const email = document.querySelector('[name="username"]').value;
-    const password = document.querySelector('[name="password"]').value;
-    const feedback = document.getElementById('feedbackArea');
-
-    auth.signInWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        return db.collection("usuarios").doc(userCredential.user.uid).get();
-      })
-      .then(doc => {
-        if (doc.exists && doc.data().tipo === "teacher") {
-          localStorage.setItem("currentUser", JSON.stringify({
-            username: email,
-            userType: "teacher"
-          }));
-          window.location.href = "docente.html";
-        } else {
-          feedback.innerHTML = `<div class="feedback error">⚠️ Este usuario no es docente</div>`;
-        }
-      })
-      .catch(err => {
-        feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
-      });
-  });
-</script>
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          return db.collection("usuarios").doc(userCredential.user.uid).get();
+        })
+        .then(doc => {
+          if (doc.exists && doc.data().tipo === "teacher") {
+            localStorage.setItem("currentUser", JSON.stringify({
+              username: email,
+              userType: "teacher"
+            }));
+            window.location.href = "docente.html";
+          } else {
+            feedback.innerHTML = `<div class="feedback error">⚠️ Este usuario no es docente</div>`;
+          }
+        })
+        .catch(err => {
+          feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
+        });
+    });
+  </script>
 
 </body>
 </html>
