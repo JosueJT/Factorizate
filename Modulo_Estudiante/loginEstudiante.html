@@ -42,37 +42,33 @@
     <span>Desarrollado 💡 por Trimedia</span>
   </footer>
 
-  <script>
-    document.getElementById('formLogin').addEventListener('submit', function(e) {
-      e.preventDefault();
+<!-- Firebase compat + config central -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="../js/firebaseConfig.js"></script>
 
-      const formData = new FormData(this);
-      const feedback = document.getElementById('feedbackArea');
-      feedback.innerHTML = '';
+<script>
+  document.getElementById('formLogin').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const email = this.username.value;
+    const password = this.password.value;
+    const feedback = document.getElementById('feedbackArea');
 
-      fetch('../controlador.php', {
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.text())
-      .then(data => {
-        if (data.startsWith("OK")) {
-          // Guardar usuario en localStorage por compatibilidad
-          const tipo = data.split("|")[1];
-          localStorage.setItem("currentUser", JSON.stringify({
-            username: formData.get('username'),
-            userType: tipo
-          }));
-          window.location.href = tipo === 'student' ? 'estudiante.html' : 'docente.html';
-        } else {
-          feedback.innerHTML = `<div class="feedback error"><span class="feedback-icon">🔒</span> ${data}</div>`;
-        }
+    auth.signInWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        localStorage.setItem("currentUser", JSON.stringify({
+          username: email,
+          userType: "student"
+        }));
+        window.location.href = "estudiante.html";
       })
       .catch(err => {
-        feedback.innerHTML = `<div class="feedback error"><span class="feedback-icon">⚠️</span> Error de conexión al servidor</div>`;
-        console.error(err);
+        feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
       });
-    });
-  </script>
+  });
+</script>
+
+
 </body>
 </html>
