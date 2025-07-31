@@ -17,6 +17,7 @@
   <main class="login-container">
     <section class="login-box">
       <h2>Crear Cuenta</h2>
+      <!-- Eliminamos el submit para evitar error 405 -->
       <form id="formularioRegistro">
         <input type="email" name="email" placeholder="Correo electrónico" required>
         <input type="password" name="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
@@ -25,7 +26,8 @@
           <option value="student">Estudiante</option>
           <option value="teacher">Docente</option>
         </select>
-        <button type="submit">Registrarse</button>
+        <!-- Botón cambiado a type="button" -->
+        <button type="button" id="btnRegister">Registrarse</button>
       </form>
 
       <a href="index.html" class="forgot-password">← Volver al inicio</a>
@@ -38,14 +40,44 @@
     © 2025 Factorízate — Plataforma educativa
   </footer>
 
-<!-- Firebase SDK compat -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<!-- Tu config central -->
-<script src="../js/firebaseConfig.js"></script>
+  <!-- Configuración central -->
+  <script src="js/firebaseConfig.js"></script>
 
+  <!-- Script de registro -->
+  <script>
+    document.getElementById('btnRegister').addEventListener('click', function() {
+      const email = document.querySelector('[name="email"]').value;
+      const password = document.querySelector('[name="password"]').value;
+      const userType = document.querySelector('[name="userType"]').value;
+      const feedback = document.getElementById('feedbackArea');
 
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          // Guardamos datos extra en Firestore
+          return db.collection("usuarios").doc(userCredential.user.uid).set({
+            email: email,
+            tipo: userType
+          });
+        })
+        .then(() => {
+          feedback.innerHTML = '<div class="feedback success">✅ Usuario registrado correctamente.</div>';
+          setTimeout(() => {
+            if (userType === 'student') {
+              window.location.href = 'Modulo_Estudiante/loginEstudiante.html';
+            } else {
+              window.location.href = 'Modulo_Docente/loginDocente.html';
+            }
+          }, 1500);
+        })
+        .catch(err => {
+          feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
+        });
+    });
+  </script>
 </body>
 </html>

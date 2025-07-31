@@ -21,9 +21,10 @@
     <section class="login-box">
       <h2>Iniciar Sesión</h2>
       <form id="formLogin">
-        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="email" name="username" placeholder="Correo electrónico" required>
         <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Ingresar</button>
+        <!-- Cambiamos a type="button" -->
+        <button type="button" id="btnLoginEst">Ingresar</button>
       </form>
 
       <a href="../recuperar_contraseña.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
@@ -42,33 +43,31 @@
     <span>Desarrollado 💡 por Trimedia</span>
   </footer>
 
-<!-- Firebase compat + config central -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="../js/firebaseConfig.js"></script>
+  <!-- Firebase SDK + Config -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebaseConfig.js"></script>
 
-<script>
-  document.getElementById('formLogin').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = this.username.value;
-    const password = this.password.value;
-    const feedback = document.getElementById('feedbackArea');
+  <!-- Script de login estudiante -->
+  <script>
+    document.getElementById('btnLoginEst').addEventListener('click', function() {
+      const email = document.querySelector('[name="username"]').value;
+      const password = document.querySelector('[name="password"]').value;
+      const feedback = document.getElementById('feedbackArea');
 
-    auth.signInWithEmailAndPassword(email, password)
-      .then(userCredential => {
-        localStorage.setItem("currentUser", JSON.stringify({
-          username: email,
-          userType: "student"
-        }));
-        window.location.href = "estudiante.html";
-      })
-      .catch(err => {
-        feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
-      });
-  });
-</script>
-
-
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          localStorage.setItem("currentUser", JSON.stringify({
+            username: email,
+            userType: "student"
+          }));
+          window.location.href = "estudiante.html";
+        })
+        .catch(err => {
+          feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
+        });
+    });
+  </script>
 </body>
 </html>
