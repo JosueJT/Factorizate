@@ -20,7 +20,7 @@ const exercises = {
     { problem: "9m²+12m", answer: "3m(3m+4)", hint: "El factor común es 3m" },
     { problem: "25p²+30p", answer: "5p(5p+6)", hint: "Factor común: 5p" },
     { problem: "18x³+24x²", answer: "6x²(3x+4)", hint: "El factor común es 6x²" },
-    { problem: "20a²+30a", answer: "10a(a+3)", hint: "Saca 10a" },
+    { problem: "20a²+30a", answer: "10a(2a+3)", hint: "Saca 10a" },
     { problem: "12b³+16b²", answer: "4b²(3b+4)", hint: "Factor común 4b²" },
     { problem: "15c²+25c", answer: "5c(3c+5)", hint: "Saca 5c" }
   ],
