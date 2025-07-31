@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Panel Docente</title>
-  <link rel="stylesheet" href="style/index.css">
+  <link rel="stylesheet" href="../style/index.css">
 </head>
 <body>
   <div class="container">
@@ -19,7 +19,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      fetch('controlador.php?accion=estudiantes')
+      fetch('../controlador.php?accion=estudiantes')
         .then(res => res.json())
         .then(estudiantes => {
           const contenedor = document.getElementById('studentsList');
@@ -77,7 +77,7 @@
 
     function cerrarSesion() {
       localStorage.removeItem("currentUser");
-      window.location.href = "index.html";
+      window.location.href = "../index.html";
     }
 
     function enviarRecomendacion(usuario) {

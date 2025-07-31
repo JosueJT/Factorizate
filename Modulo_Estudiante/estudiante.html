@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Factorízate - Estudiante</title>
+  <link rel="stylesheet" href="../style/index.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .math-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0 20px;
+      justify-content: center;
+    }
+
+    .math-toolbar button {
+      padding: 10px 14px;
+      font-size: 1.1rem;
+      background: #eee;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .math-toolbar button:hover {
+      background-color: #ddd;
+    }
+
+    #studentAnswer {
+      width: 100%;
+      font-size: 1.2rem;
+      padding: 12px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      margin: 10px 0 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="hero">
+    <h1 id="studentName">¡Bienvenido, estudiante!</h1>
+    <p>Selecciona un nivel para comenzar a practicar.</p>
+    <button class="btn btn-secondary" onclick="cerrarSesion()" style="margin-top: 10px;">🚪 Salir</button>
+  </header>
+
+  <main class="cards" id="niveles">
+    <div class="card" onclick="startLevel(1)">
+      <img src="https://cdn-icons-png.flaticon.com/512/2203/2203187.png" alt="Nivel 1">
+      <h3>Nivel 1: Factor Común</h3>
+      <p>Identifica y extrae factores comunes en expresiones algebraicas.</p>
+    </div>
+
+    <div class="card" onclick="startLevel(2)">
+      <img src="https://cdn-icons-png.flaticon.com/512/167/167707.png" alt="Nivel 2">
+      <h3>Nivel 2: Diferencia de Cuadrados</h3>
+      <p>Aplica la fórmula a² - b² = (a + b)(a - b).</p>
+    </div>
+  </main>
+
+  <section id="exerciseSection" class="login-container" style="display: none;">
+    <div class="login-box" style="width: 100%; max-width: 800px;">
+      <h2 id="exerciseTitle">Ejercicio Actual</h2>
+
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%;"></div>
+      </div>
+      <div class="step-indicator">
+        <div class="step active">1</div>
+        <div class="step">2</div>
+        <div class="step">3</div>
+        <div class="step">4</div>
+      </div>
+
+      <div id="exerciseProblem" class="exercise-problem">...</div>
+      <div class="visual-blocks" id="visualBlocks"></div>
+
+      <label for="studentAnswer" style="font-weight: bold;">Tu respuesta:</label>
+      <input type="text" id="studentAnswer" placeholder="Escribe aquí la factorización...">
+
+      <div id="mathKeyboard">
+        <div class="math-key" onclick="insertSymbol('²')">x²</div>
+        <div class="math-key" onclick="insertSymbol('³')">x³</div>
+        <div class="math-key" onclick="insertSymbol('√')">√</div>
+        <div class="math-key" onclick="insertSymbol('(')">(</div>
+        <div class="math-key" onclick="insertSymbol(')')">)</div>
+        <div class="math-key" onclick="insertSymbol('+')">+</div>
+        <div class="math-key" onclick="insertSymbol('-')">−</div>
+        <div class="math-key" onclick="insertSymbol('=')">=</div>
+        <div class="math-key" onclick="insertSymbol('^')">^</div>
+        <div class="math-key" onclick="insertSymbol('x')">x</div>
+        <div class="math-key" onclick="insertSymbol('a')">a</div>
+        <div class="math-key" onclick="insertSymbol('b')">b</div>
+      </div>
+
+
+      <div class="button-grid">
+        <button class="btn" onclick="checkAnswer()">✅ Verificar</button>
+        <button class="btn btn-secondary" onclick="getHint()">💡 Pista</button>
+        <button class="btn btn-secondary" onclick="previousStep()">⬅ Anterior</button>
+        <button class="btn" onclick="nextStep()">Siguiente ➡</button>
+      </div>
+
+      <div id="feedbackArea"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    © 2025 Factorízate — Plataforma educativa para dominar la factorización algebraica
+    <span>Desarrollado 💡 por Trimedia</span>
+  </footer>
+
+</body>
+
+<script src="../js/funciones.js"></script>
+<script>
+  // Validación del usuario conectado
+  const user = JSON.parse(localStorage.getItem('currentUser'));
+  if (!user || user.userType !== 'student') {
+    window.location.href = 'loginEstudiante.html';
+  } else {
+    document.getElementById('studentName').textContent = `¡Bienvenido, ${user.username}! 🎓`;
+  }
+</script>
+
+</html>

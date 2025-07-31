@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Factorízate - Iniciar Sesión</title>
-  <link rel="stylesheet" href="style/index.css">
+  <link rel="stylesheet" href="../style/index.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <header class="hero" style="position: relative;">
-    <button onclick="window.location.href='index.html'" class="btn btn-secondary" style="position: absolute; top: 20px; left: 20px;">
+    <button onclick="window.location.href='../index.html'" class="btn btn-secondary" style="position: absolute; top: 20px; left: 20px;">
       ← Volver
     </button>
-    <img src="img/logo.png" alt="Logo Factorízate">
+    <img src="../img/logo.png" alt="Logo Factorízate">
     <h1>Inicio de Sesión - Estudiante</h1>
     <p>Accede a tus clases y ejercicios personalizados.</p>
   </header>
@@ -26,8 +26,8 @@
         <button type="submit">Ingresar</button>
       </form>
 
-      <a href="recuperar_contraseña.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
-      <a href="registro.html" class="forgot-password">¿No tienes cuenta? Regístrate</a>
+      <a href="../recuperar_contraseña.html" class="forgot-password">¿Olvidaste tu contraseña?</a>
+      <a href="../registro.html" class="forgot-password">¿No tienes cuenta? Regístrate</a>
 
       <div id="feedbackArea"></div>
     </section>
@@ -50,7 +50,7 @@
       const feedback = document.getElementById('feedbackArea');
       feedback.innerHTML = '';
 
-      fetch('controlador.php', {
+      fetch('../controlador.php', {
         method: 'POST',
         body: formData
       })
