@@ -40,7 +40,7 @@ const exercises = {
 
 // ==========================
 // Funciones de ejercicios
-// ==========================
+// =================F=========
 
 // Inicia nivel
 function startLevel(level) {
@@ -156,15 +156,31 @@ function updateProgress() {
 
 // Guardar resultados
 function recordResult(entry) {
-  const results = JSON.parse(localStorage.getItem('results') || '[]');
-  results.push({
-    ...entry,
-    user: currentUser ? currentUser.username : "anon",
-    date: new Date().toISOString()
-  });
-  localStorage.setItem('results', JSON.stringify(results));
-}
+  const userData = JSON.parse(localStorage.getItem('currentUser'));
+  if (!userData || !userData.uid) return;
 
+  const userRef = db.collection("usuarios").doc(userData.uid);
+
+  userRef.get().then(doc => {
+    if (!doc.exists) return;
+
+    let progreso = doc.data().progreso || { correctas: 0 };
+
+    // 🔹 Solo sumamos si está correcto
+    if (entry.correct) {
+      progreso.correctas += 1;
+    }
+
+    // 🔹 El total siempre es fijo (20)
+    progreso.total = 20;
+
+    console.log("🔥 Guardando progreso:", progreso);
+
+    return userRef.update({ progreso });
+  }).catch(err => {
+    console.error("❌ Error al guardar progreso:", err);
+  });
+}
 // Insertar símbolo
 function insertSymbol(symbol) {
   const input = document.getElementById('studentAnswer');

@@ -59,7 +59,9 @@
 
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
+          const user = userCredential.user;
           localStorage.setItem("currentUser", JSON.stringify({
+            uid: userCredential.user.uid,  // ✅ guardar UID real
             username: email,
             userType: "student"
           }));
@@ -68,7 +70,8 @@
         .catch(err => {
           feedback.innerHTML = `<div class="feedback error">❌ ${err.message}</div>`;
         });
-    });
+      });
+
   </script>
 </body>
 </html>

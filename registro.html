@@ -62,7 +62,8 @@
           // Guardar en Firestore
           return db.collection("usuarios").doc(uid).set({
             email: email,
-            tipo: tipo
+            tipo: tipo,
+            progreso: { correctas: 0, total: 0 }   // 🔹 inicializar progreso
           });
         })
         .then(() => {
