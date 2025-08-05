@@ -427,21 +427,84 @@ body {
     font-size: 1.6rem;
   }
 
+  .hero img {
+    height: 80px;
+  }
+
   .cards {
     flex-direction: column;
     align-items: center;
-    padding: 40px 15px;
+    padding: 30px 15px;
+    gap: 20px;
+  }
+
+  .card {
+    width: 90%;
+    max-width: 320px;
   }
 
   .login-container {
     flex-direction: column;
-    padding: 40px 10px;
+    padding: 30px 10px;
   }
 
-  .login-box, .illustration {
-    margin: 10px 0;
+  .illustration {
+    max-width: 280px;
+    margin: 15px auto;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .footer {
+    font-size: 0.8rem;
+    padding: 20px 10px;
   }
 }
+
+/* ---------------------------- */
+/* EXTRA para móviles pequeños  */
+/* ---------------------------- */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.3rem;
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+  }
+
+  .card img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .card h3 {
+    font-size: 1.1rem;
+  }
+
+  .login-box {
+    padding: 25px 20px;
+  }
+
+  .login-box h2 {
+    font-size: 1.3rem;
+  }
+
+  .btn, .login-box button {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+
+  .step {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
 
 
  .recovery-container {
